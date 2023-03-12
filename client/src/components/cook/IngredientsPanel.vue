@@ -14,7 +14,7 @@
     </Listbox>
     <div v-if="ingredientStore.selectedIngredient != null">
       <Divider/>
-      <IngredientCard class="ingredient-card" :item="ingredientStore.selectedIngredient" />
+      <IngredientCard class="ingredient-card" />
     </div>
   </div>
 </template>
@@ -23,17 +23,21 @@
 import { onMounted } from 'vue'
 import { useDialog } from 'primevue/usedialog'
 import axios from 'axios'
-import { useIngredientStore } from '../script/stores/ingredientStore'
-import IngredientForm from './IngredientForm'
+import { useIngredientStore } from '@/script/stores/ingredientStore'
+import IngredientForm from '@/components/cook/IngredientForm'
 
 const ingredientStore = useIngredientStore()
 
 onMounted(async () => {
-  try {
-    const response = await axios.get('http://192.168.1.23:5000/api/ingredient')
-    ingredientStore.$patch(store => store.ingredients = response.data)
-  } catch (error) {
-    alert(error)
+  if (ingredientStore.ingredients.length == 0) {
+    try {
+      const response = await axios.get('http://192.168.1.23:5000/api/ingredient')
+      const ingredients = response.data
+      ingredients.sort((a, b) => Number(b.favourite) - Number(a.favourite))
+      ingredientStore.$patch(store => store.ingredients = ingredients)
+    } catch (error) {
+      alert(error)
+    }
   }
 })
 
@@ -60,7 +64,7 @@ const addIngredient = () => {
 
           ingredientStore.addIngredient(response.data)
         } catch (error) {
-          alert('Unable to update item 😢. Please try again later.')
+          alert('Unable to save ingredient 😢. Please try again later.')
           console.log(error)
         }
       }

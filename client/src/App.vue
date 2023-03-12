@@ -1,5 +1,7 @@
 <template>
   <div>
+    <ConfirmDialog/>
+    <Toast position="center" />
     <DynamicDialog/>
     <TabMenu :model="items"/> 
     <router-view/>

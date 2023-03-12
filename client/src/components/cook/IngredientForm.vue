@@ -26,8 +26,8 @@
           <label for="serving_size">Serving size (g)</label>
       </span>
     </div>
-    <Button type="button" label="Confirm" @click="confirmEdit" style="float: right"></Button>
-    <Button type="button" label="Cancel" class="p-button-secondary" @click="cancelEdit" style="float: right; margin-right: 0.5rem"></Button>
+    <Button type="button" label="Confirm" @click="confirmEdit" />
+    <Button type="button" label="Cancel" class="p-button-secondary" @click="cancelEdit" style="float: right; margin-right: 0.5rem" />
   </div>
 </template>
 

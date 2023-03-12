@@ -4,13 +4,11 @@
     <div class="input-block">
       <span class="p-float-label">
         <InputText id="label" type="text" v-model="label" />
-        <label for="label">Recipe name</label>
+        <label for="label">Meal name</label>
       </span>
 
     </div>
-    <ToggleButton v-model="saveRecipe" onLabel="Save recipe" offLabel="Don't save" onIcon="pi pi-check" offIcon="pi pi-times"  class="w-full sm:w-10rem" />
-    <Button type="button" label="Confirm" @click="confirmCommit" style="float: right"></Button>
-    <Button type="button" label="Cancel" class="p-button-secondary" @click="cancelCommit" style="float: right; margin-right: 0.5rem"></Button>
+    <ConfirmOrCancel v-if="label != null && label.length > 0" @confirm="confirmCommit" @cancel="cancelCommit"/>
   </div>
 </template>
 
@@ -18,14 +16,13 @@
 import { ref, onMounted, inject } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import axios from 'axios'
-import { useRecipeStore } from '../script/stores/recipeStore'
+import { useRecipeStore } from '@/script/stores/recipeStore'
 
 const recipeStore = useRecipeStore()
 
 const dialogRef = inject('dialogRef')
 const recipe = ref()
 const label = ref()
-const saveRecipe = ref(false)
 
 
 onMounted(() => {
@@ -43,15 +40,12 @@ const confirmCommit = async () => {
         label: label.value || null,
         calories: recipe.value.calories,
         protein: recipe.value.protein,
-        meals_created: recipe.value.servings,
-        ingredients: recipeStore.currentIngredients.map((i) => ({
-          id: i.id,
-          amount_grams: i.grams,
-          amount_servings: i.portions // TODO rename servings
-        }))
+        meals_created: recipe.value.meals,
+        ingredients: recipeStore.currentIngredients
       })
     })
     toast.add({severity:'success', summary: 'Saved!', detail:'Meals have been saved.', life: 3000})
+    recipeStore.startNewRecipe()
     dialogRef.value.close()
   } catch (error) {
     toast.add({severity:'error', summary: 'Error!', detail:'Unable to save meal 😢. Try again later.', life: 3000})

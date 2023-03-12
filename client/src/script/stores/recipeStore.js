@@ -28,21 +28,38 @@ export const useRecipeStore = defineStore('recipes', {
       }
       return state.selectedRecipe.ingredients
     },
-    totalCalories() {
-      return this.currentIngredients.map(i => i.calories).reduce((a, b) => a + b, 0)
-    },
-    totalProtein() {
-      return this.currentIngredients.map(i => i.protein).reduce((a, b) => a + b, 0)
-    },
-    totalGrams() {
-      return this.currentIngredients.map(i => i.grams).reduce((a, b) => a + b, 0)
-    },
-    averageRatio() {
-      const totalGrams = this.totalGrams
-      if (totalGrams == 0) {
-        return 0
+    calories() {
+      return (numberOfMeals) => {
+        return this.currentIngredients.map(i => {
+          if (i.perMeal) {
+            return i.calories
+          } else {
+            return i.calories / numberOfMeals
+          }
+        }).reduce((a, b) => a + b, 0)
       }
-      return (this.totalProtein / this.totalCalories) * 100
+    },
+    protein() {
+      return (numberOfMeals) => {
+        return this.currentIngredients.map(i => {
+          if (i.perMeal) {
+            return i.protein
+          } else {
+            return i.protein / numberOfMeals
+          }
+        }).reduce((a, b) => a + b, 0)
+      }
+    },
+    grams() {
+      return (numberOfMeals) => {
+        return this.currentIngredients.map(i => {
+          if (i.perMeal) {
+            return i.grams
+          } else {
+            return i.grams / numberOfMeals
+          }
+        }).reduce((a, b) => a + b, 0)
+      }
     }
   }
 })

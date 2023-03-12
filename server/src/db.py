@@ -1,136 +1,123 @@
 import os
 import sys
-import sqlite3 as sl
 import dataclasses
-from src.model import Ingredient, Recipe, RecipeIngredient, Meal
+from datetime import datetime, date
+from tinydb import TinyDB, Query
 import logging
+from src import util
+from src.model import Goal, DayProgress
+
+db = TinyDB(os.path.join(sys.path[0], 'database.db'))
+ingredients = db.table('ingredients')
+meals = db.table('meals')
+favourite_meals = db.table('favourite_meals')
+goals = db.table('goals')
+days_progress = db.table('days_progress')
 
 
-con = sl.connect(os.path.join(sys.path[0], 'test.db'), check_same_thread=False)
 logger = logging.getLogger()
 
-sql_location = os.path.join(sys.path[0], *['res', 'create_tables.sql'])
-with open(sql_location, 'r') as sql_file:
-  sql = sql_file.read()
-  with con:
-    con.cursor().executescript(sql)
+
+def document_id_to_id(*items):
+  def with_id(item):
+    item['id'] = item.doc_id
+    return item
+  return [with_id(item) for item in items]
+
 
 def all_ingredients():
-  with con:
-    res = con.cursor().execute('SELECT * FROM ingredient ORDER BY favourite DESC, label ASC')
-    return [Ingredient(*r) for r in res.fetchall()]
+  return document_id_to_id(*ingredients.all())
 
 
-def set_favourite(id, favourite):
-  with con:
-    res = con.cursor().execute('''
-    UPDATE ingredient 
-    SET favourite = ? 
-    WHERE id = ?
-    RETURNING favourite''', [favourite, id])
-    return res.fetchone()[0] == 1
-
+def toggle_favourite(id):
+  def toggle(doc):
+    doc['favourite'] = not doc['favourite']
+    return doc
+    
+  ingredients.update(toggle, doc_ids=[id])
+  return ingredients.get(doc_id=id)['favourite']
 
 
 def save_ingredient(ingredient):
-  if ingredient.id is None:
-    logger.debug('inserting %s', ingredient)
-    return _insert_ingredient(ingredient)
-  else:
-    logger.debug('updating %s', ingredient)
-    return _update_ingredient(ingredient)
+  res = ingredients.upsert(dataclasses.asdict(ingredient), Query().label == ingredient.label)
+  return res[0]
     
 
 def delete_ingredient(id):
-    with con:
-      con.cursor().execute('''
-      DELETE 
-      FROM ingredient 
-      WHERE id = ?''', [id])
+  ingredients.remove(doc_ids=[id])
 
 
-def save_recipe(recipe, ingredients):
-  if recipe.id is None:
-    logger.debug('inserting %s with %s', recipe, ingredients)
-    return _insert_recipe(recipe, ingredients)
-  else:
-    logger.debug('updating %s with %s', recipe, ingredients)
-    return _update_recipe(recipe, ingredients)
+def all_meals():
+  return document_id_to_id(*meals.search(Query().meals_remaining > 0))
 
 
 def save_meal(meal):
-  if meal.id is None:
-    logger.debug('inserting %s', meal)
-    return _insert_meal(meal)
+  res = meals.insert(dataclasses.asdict(meal))
+  return res[0]
+
+
+def delete_meal(id):
+  meals.remove(doc_ids=[id])
+
+
+def save_favoruite_meal(favoruite_meal):
+  res = favourite_meals.upsert(dataclasses.asdict(favoruite_meal), Query().label == favoruite_meal.label)
+  return res[0]
+
+
+def delete_favoruite_meal(id):
+  favourite_meals.remove(doc_ids=[id])
+
+
+def all_favourite_meals():
+  regular_meals = all_meals()
+  favourites = document_id_to_id(*favourite_meals.all())
+  []
+
+
+def eat_meal(id):
+  def eat(doc):
+    doc['times_eaten'] = doc['times_eaten'] + [util.date_to_string(datetime.now())]
+    doc['meals_remaining'] = doc['meals_remaining'] - 1
+    return doc
+
+  meals.update(eat, doc_ids=[id])
+  meal = meals.get(doc_id=id)
+
+  today = todays_progress()
+  today['meals'] = today['meals'] + [meal]
+  today['calories'] = today['calories'] + meal['calories']
+  today['protein'] = today['protein'] + meal['protein']
+
+  days_progress.update(today, doc_ids=[today.doc_id])
+
+  return {
+    **document_id_to_id(meal)[0],
+    **{'progress': today}
+  }
+
+
+def current_goal():
+  all_goals = [Goal(calories=g['calories'], protein=g['protein'], from_day=g['from_day']) for g in goals.all()]
+  return max(all_goals, key=lambda g: util.string_to_date(g.from_day))
+
+
+def save_goal(goal):
+  current = current_goal()
+  if current.calories != goal.calories or current.protein != goal.protein:
+    res = goals.upsert(dataclasses.asdict(goal), Query().from_day == goal.from_day)
+    return res[0]
   else:
-    logger.debug('updating %s', meal)
-    return _update_meal(meal)
+    logger.info('Not updatating goal to %s as it is the same as the current goal %s', goal, current)
 
 
-def _insert_ingredient(ingredient):
-  with con:
-    res = con.cursor().execute('''
-    INSERT INTO ingredient (label, calories, proteins, serving_size) 
-    VALUES(?,?,?,?)
-    RETURNING id''', 
-    [ingredient.label, ingredient.calories, ingredient.proteins, ingredient.serving_size])
-    
-    return res.fetchone()[0]
-
-
-def _insert_recipe_ingredients(recipe_ingredients):
-  with con:
-    con.cursor().executemany('''
-    INSERT INTO recipe_ingredient(recipe_id, ingredient_id, amount_grams, amount_servings)
-    VALUES(?,?,?,?)''',
-    [(i.recipe_id, i.ingredient_id, i.amount_grams, i.amount_servings) for i in recipe_ingredients])
-
-
-def _update_ingredient(ingredient):
-  with con:
-    con.cursor().execute('''
-    UPDATE ingredient
-    SET label=?,
-    calories=?,
-    proteins=?,
-    serving_size=?
-    WHERE id=?''', 
-    [ingredient.label, ingredient.calories, ingredient.proteins, ingredient.serving_size, ingredient.id])
-
-    return ingredient.id 
+def todays_progress():
+  today = util.date_to_string(date.today())
+  res = days_progress.search(Query().day == today)
   
-
-def _insert_recipe(recipe, ingredients):
-  with con:
-    cursor = con.cursor()
-    res = cursor.execute('''
-    INSERT INTO recipe (label) 
-    VALUES(?)
-    RETURNING id''', 
-    [recipe.label])
-    
-    recipe_id = res.fetchone()[0]
-    ingredients_with_id = [dataclasses.replace(i, recipe_id=recipe_id) for i in ingredients]
-
-    _insert_recipe_ingredients(ingredients_with_id)
-
-    return recipe_id
-
-
-def _update_recipe(recipe, ingredients):
-  pass
-  
-
-def _insert_meal(meal):
-  with con:
-    res = con.cursor().execute('''
-    INSERT INTO meal (recipe_id, calories, protein, meals_created, meals_remaining) 
-    VALUES(?,?,?,?,?)
-    RETURNING id''', 
-    [meal.recipe_id, meal.calories, meal.protein, meal.meals_created, meal.meals_remaining])
-    return res.fetchone()[0]
-    
-
-def _update_meal(meal):
-  pass
-  
+  if len(res) > 0:
+    return res[0]
+  else:
+    zero = dataclasses.asdict(DayProgress(today, 0, 0))
+    days_progress.insert(zero)
+    return zero

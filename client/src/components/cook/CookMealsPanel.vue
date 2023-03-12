@@ -1,22 +1,22 @@
 <template>
   <div>
     <DataTable 
-    v-model:selection="selectedServing" 
-    @rowSelect="commitServings"
+    v-model:selection="selectedMeal" 
+    @rowSelect="commitMeals"
     selectionMode="single" 
-    dataKey="id" 
-    :value="servingsRows" 
+    dataKey="meals" 
+    :value="mealsRows" 
     responsiveLayout="scroll">
         
         <template #header>
             <div class="table-header">
-                Nutrients per serving
+                Nutrients per Meal
             </div>
         </template>
         
-        <Column header="Servings">
+        <Column header="Meals">
           <template #body="slotProps">
-              {{slotProps.data.servings}}
+              {{slotProps.data.meals}}
           </template>
         </Column>
         <Column header="Calories">
@@ -30,44 +30,36 @@
           </template>
         </Column>
     </DataTable>
-    <Toast position="center" />
   </div>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
 import { useDialog } from 'primevue/usedialog'
-import { useRecipeStore } from '../script/stores/recipeStore'
-import CommitServingsForm from './CommitServingsForm.vue'
+import { useRecipeStore } from '@/script/stores/recipeStore'
+import CommitMealsForm from '@/components/cook/CommitMealsForm.vue'
 
 const recipeStore = useRecipeStore()
 
-const servingsRows = computed(() => {
-  const totalCalories = recipeStore.totalCalories
-  const totalProtein = recipeStore.totalProtein
-
-  if (totalCalories == 0) {
-    return []
-  }
+const mealsRows = computed(() => {
   const oneToTen = Array.from(Array(11).keys())
   oneToTen.splice(0, 1)
   return oneToTen.map(n => {
     return {
-      servings: n,
-      calories: totalCalories / n,
-      protein: totalProtein / n
+      meals: n,
+      calories: recipeStore.calories(n),
+      protein: recipeStore.protein(n)
     }
   })
 })
 
-const selectedServing = ref()
+const selectedMeal = ref()
 
 const dialog = useDialog()
-const commitServings = () => {
-  console.log(selectedServing.value)
-  dialog.open(CommitServingsForm, {
+const commitMeals = () => {
+  dialog.open(CommitMealsForm, {
     props: {
-      header: selectedServing.value.servings + ' servings',
+      header: selectedMeal.value.meals + ' meals',
       style: {
           width: '80%',
           maxWidth: '600px'
@@ -76,9 +68,9 @@ const commitServings = () => {
     },
     modal: true,
     data: {
-      recipe: selectedServing.value
+      recipe: selectedMeal.value
     },
-    onClose: async () => {
+    onClose: () => {
     }
   })
 }

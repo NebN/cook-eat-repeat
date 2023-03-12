@@ -1,6 +1,6 @@
 <template>
 <div>
-  <DataTable :value="recipeStore.currentIngredients.concat([totalsRow])" responsiveLayout="scroll">
+  <DataTable :value="recipeStore.currentIngredients" :rowClass="rowClass" responsiveLayout="scroll">
       
       <template #header>
           <div class="table-header">
@@ -8,7 +8,11 @@
           </div>
       </template>
       
-      <Column field="label" header="Name"></Column>
+      <Column header="Name">
+        <template #body="slotProps">
+            {{slotProps.data.label}}
+        </template>
+      </Column>
       <Column header="Amount">
         <template #body="slotProps">
             {{slotProps.data.grams.toFixed()}}g{{slotProps.data.portions != null ? ' ('+slotProps.data.portions+')' : ''}}
@@ -21,7 +25,7 @@
       </Column>
       <Column header="Protein">
         <template #body="slotProps">
-            {{slotProps.data.protein.toFixed()}}g
+            {{slotProps.data.protein.toFixed(1)}}g
         </template>
       </Column>
       <Column header="Ratio">
@@ -32,36 +36,34 @@
       <Column>
         <template #body="slotProps">
             <div v-if="slotProps.data.id != null">
-                <Button @click="deleteIngredient(slotProps.data)" icon="pi pi-trash" class="p-button-rounded p-button-secondary p-button-text p-button-danger" style="float: right" />
-                <Button @click="editIngredient(slotProps.data)" icon="pi pi-pencil" class="p-button-rounded p-button-secondary p-button-text p-button-secondary" style="float: right" />
+                <Button @click="deleteIngredient(slotProps.data)" icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" style="float: right" />
+                <Button @click="editIngredient(slotProps.data)" icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-secondary" style="float: right" />
             </div>
         </template>
       </Column>
 
   </DataTable>
-  <ServingsPanel/>
+  <CookMealsPanel v-if="recipeStore.currentIngredients.length > 0"/>
 </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useRecipeStore } from '../script/stores/recipeStore'
+import { ref } from 'vue'
+import { useRecipeStore } from '@/script/stores/recipeStore'
 import { useDialog } from 'primevue/usedialog'
-import RecipeIngredientForm from './RecipeIngredientForm'
+import IngredientAmountForm from '@/components/cook/IngredientAmountForm'
 
 const recipeStore = useRecipeStore()
-const totalsRow = computed(() => {
-    return {
-        label: 'Total',
-        grams: recipeStore.totalGrams,
-        calories: recipeStore.totalCalories,
-        protein: recipeStore.totalProtein,
-        ratio: recipeStore.averageRatio
-    }
-})
 const dialog = useDialog()
+
+const rowClass = ref((rowIngredient) => {
+  if (rowIngredient.perMeal) {
+    return 'per-meal'
+  }
+})
+
 const editIngredient = (ingredient) => {
-  dialog.open(RecipeIngredientForm, {
+  dialog.open(IngredientAmountForm, {
     props: {
       header: ingredient.label,
       style: {
@@ -72,10 +74,18 @@ const editIngredient = (ingredient) => {
     },
     modal: true,
     data: {
-      item: ingredient,
+      ingredient: ingredient,
     },
-    onClose: () => {
-     
+    onClose: (item) => {
+      if (item.data != null) {
+        const data = item.data
+        ingredient.grams = data.grams
+        ingredient.servings = data.servings
+        ingredient.calories = data.calories
+        ingredient.protein = data.protein
+        ingredient.ratio = data.ratio
+        ingredient.perMeal = data.perMeal
+      }
     }
   })
 }
@@ -86,8 +96,9 @@ const deleteIngredient = (ingredient) => {
 
 </script>
 
-<style scoped>
-.p-button {
-  margin-left: .5rem;
+<style>
+.per-meal {
+  font-weight: bold;
+  font-style: italic;
 }
 </style>

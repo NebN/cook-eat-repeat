@@ -34,16 +34,23 @@ import DataTable from 'primevue/datatable'
 import ToggleButton from 'primevue/togglebutton'
 import Column from 'primevue/column'
 import Toast from 'primevue/toast'
+import Chart from 'primevue/chart'
 
-import IngredientsPanel from './components/IngredientsPanel'
-import ServingsPanel from './components/ServingsPanel'
-import IngredientCard from './components/IngredientCard'
-import RecipePanel from './components/RecipePanel'
-import IngredientForm from './components/IngredientForm'
-import RecipeIngredientForm from './components/RecipeIngredientForm'
-import IngredientQuantity from './components/IngredientQuantity'
-import CommitServingsForm from './components/CommitServingsForm'
+import ConfirmOrCancel from './components/ConfirmOrCancel'
 
+import IngredientsPanel from './components/cook/IngredientsPanel'
+import CookMealsPanel from './components/cook/CookMealsPanel'
+import IngredientCard from './components/cook/IngredientCard'
+import RecipePanel from './components/cook/RecipePanel'
+import IngredientForm from './components/cook/IngredientForm'
+import IngredientAmountForm from './components/cook/IngredientAmountForm'
+import CommitMealsForm from './components/cook/CommitMealsForm'
+
+import EatMealsPanel from './components/eat/EatMealsPanel'
+import TodayChart from './components/eat/TodayChart'
+
+import GoalCard from './components/repeat/GoalCard'
+import MealHistory from './components/repeat/MealHistory'
 
 const routes = [
   {
@@ -114,12 +121,17 @@ createApp(App)
 .component('Column', Column)
 .component('Toast', Toast)
 .component('ToggleButton', ToggleButton)
+.component('Chart', Chart)
 .component('IngredientsPanel', IngredientsPanel)
 .component('RecipePanel', RecipePanel)
 .component('IngredientCard', IngredientCard)
 .component('IngredientForm', IngredientForm)
-.component('RecipeIngredientForm', RecipeIngredientForm)
-.component('ServingsPanel', ServingsPanel)
-.component('IngredientQuantity', IngredientQuantity)
-.component('CommitServingsForm', CommitServingsForm)
+.component('CookMealsPanel', CookMealsPanel)
+.component('IngredientAmountForm', IngredientAmountForm)
+.component('CommitMealsForm', CommitMealsForm)
+.component('ConfirmOrCancel', ConfirmOrCancel)
+.component('EatMealsPanel', EatMealsPanel)
+.component('GoalCard', GoalCard)
+.component('TodayChart', TodayChart)
+.component('MealHistory', MealHistory)
 .mount('#app')
