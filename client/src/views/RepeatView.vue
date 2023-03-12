@@ -1,5 +1,8 @@
 <template>
-  <div>Repeat :></div>
+  <div>
+    <GoalCard />
+    <MealHistory />
+  </div>
 </template>
 
 <script setup>
