@@ -13,7 +13,8 @@ export const useMealStore = defineStore('meals', {
     todaysProgress: {
       calories: 0,
       protein: 0
-    }
+    },
+    allProgress: []
   }),
   actions: {
     async initGoal() {
@@ -23,6 +24,13 @@ export const useMealStore = defineStore('meals', {
       const respToday = await axios.get('http://192.168.1.23:5000/api/goal/today')
       const today = respToday.data
       this.todaysProgress = today
+      const respAll = await axios.get('http://192.168.1.23:5000/api/goal/all')
+      const all = respAll.data
+      this.allProgress = all
+      const respMealHistory = await axios.get('http://192.168.1.23:5000/api/meal/history')
+      const mealHistory = respMealHistory.data
+      console.log(mealHistory)
+      this.mealHistory = mealHistory
     },
     async eatMeal(meal) {
       const resp = await axios({

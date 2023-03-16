@@ -51,6 +51,8 @@ import TodayChart from './components/eat/TodayChart'
 
 import GoalCard from './components/repeat/GoalCard'
 import MealHistory from './components/repeat/MealHistory'
+import ProgressHistory from './components/repeat/ProgressHistory'
+
 
 const routes = [
   {
@@ -134,4 +136,5 @@ createApp(App)
 .component('GoalCard', GoalCard)
 .component('TodayChart', TodayChart)
 .component('MealHistory', MealHistory)
+.component('ProgressHistory', ProgressHistory)
 .mount('#app')

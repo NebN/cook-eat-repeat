@@ -2,7 +2,7 @@
 <div>
   <div class="quantity-input">
     <SelectButton v-model="selectedInputMode" :options="quantityInputModes" :unselectable="false" :disabled="ingredient.serving_size == null"/>
-    <InputText type="number" v-model="quantity" style="margin-top: 0.5rem"/>
+    <InputText @keyup.enter="quantity > 0 ? confirm() : null" type="number" v-model="quantity" style="margin-top: 0.5rem" autofocus/>
     <SelectButton v-model="selectedAddMode" :options="addModes" :unselectable="false" style="margin-top: .5rem" />
   </div>
   <div v-if="computedGrams >= 0">
@@ -30,7 +30,7 @@ const addModes = ref(['In total','For each meal'])
 const selectedAddMode = ref(addModes.value[0])
 
 onMounted(() => {
-  quantity.value = 0 
+  quantity.value = null
 
   const inputIngredient = dialogRef.value.data.ingredient
   ingredient.value = inputIngredient

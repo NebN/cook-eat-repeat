@@ -1,3 +1,5 @@
+import traceback
+from functools import wraps
 from flask import Flask, request
 from flask_cors import CORS
 from http import HTTPStatus
@@ -11,7 +13,20 @@ CORS(app, resources={r"/api/*": {"origins": ['http://localhost:8080', 'http://19
 
 logger = logging.getLogger()
 
+def error_managed(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as error:
+            logger.error('Unhandled exception during %s: %s', f.__name__, error)
+            logger.debug(traceback.format_exc())
+            return {'errorMessage': 'unexpected error'}, HTTPStatus.INTERNAL_SERVER_ERROR
+    return wrapper
+
+
 @app.route('/api/ingredient', methods=['GET', 'POST', 'DELETE'])
+@error_managed
 def ingredient():
     if request.method == 'GET':
         return all_ingredients()
@@ -22,6 +37,7 @@ def ingredient():
 
 
 @app.route('/api/meal', methods=['GET', 'POST', 'DELETE'])
+@error_managed
 def meal():
     if request.method == 'GET':
         return all_meals()
@@ -31,20 +47,25 @@ def meal():
         return delete_meal()
 
 
+@app.route('/api/meal/history', methods=['GET'])
+@error_managed
+def meal_history():
+    meals = db.all_cooked_meals()
+    return meals, HTTPStatus.OK
+
+
 @app.route('/api/meal/eat', methods=['POST'])
+@error_managed
 def eat_meal():
     data = request.get_json()
     id = data['id']
     logger.debug('Eating meal id %s', id)
-    try:
-        update = db.eat_meal(id)
-        return update, HTTPStatus.OK
-    except Exception as error:
-        logger.error('Unhandled exception during eat_meal: %s', error)
-        return {'errorMessage': 'unexpected error'}, HTTPStatus.INTERNAL_SERVER_ERROR
+    update = db.eat_meal(id)
+    return update, HTTPStatus.OK
 
 
 @app.route('/api/goal', methods=['POST', 'GET'])
+@error_managed
 def goal():
     if request.method == 'POST':
         return save_goal()
@@ -53,27 +74,27 @@ def goal():
 
 
 @app.route('/api/goal/today', methods=['GET'])
+@error_managed
 def todays_progress():
-    try:
-        progress = db.todays_progress()
-        return progress, HTTPStatus.OK
-    except Exception as error:
-        logger.error('Unhandled exception during current_goal: %s', error)
-        return {'errorMessage': 'unexpected error'}, HTTPStatus.INTERNAL_SERVER_ERROR
+    progress = db.todays_progress()
+    return progress, HTTPStatus.OK
+
+
+@app.route('/api/goal/all', methods=['GET'])
+@error_managed
+def all_progress():
+    progress = db.all_progress()
+    return progress, HTTPStatus.OK
 
 
 @app.route('/api/ingredient/favourite', methods=['POST'])
+@error_managed
 def set_favourite():
     data = request.get_json()
     id = data['id']
     logger.debug('Toggling favourite for id=%s', id)
-    try:
-        res = db.toggle_favourite(id=id)
-        return {'newFavourite': res}, HTTPStatus.OK
-    
-    except Exception as error:
-        logger.error('Unhandled exception during set_favourite: %s', error)
-        return {'errorMessage': 'unexpected error'}, HTTPStatus.INTERNAL_SERVER_ERROR
+    res = db.toggle_favourite(id=id)
+    return {'newFavourite': res}, HTTPStatus.OK
         
 
 def save_goal():
@@ -82,21 +103,13 @@ def save_goal():
     protein = data['protein']
     goal = Goal(calories, protein)
     logger.debug('Saving goal%s', goal)
-    try:
-        db.save_goal(goal)
-        return {'from_day': goal.from_day}, HTTPStatus.OK
-    except Exception as error:
-        logger.error('Unhandled exception during save_goal: %s', error)
-        return {'errorMessage': 'unexpected error'}, HTTPStatus.INTERNAL_SERVER_ERROR
+    db.save_goal(goal)
+    return {'from_day': goal.from_day}, HTTPStatus.OK
 
 
 def current_goal():
-    try:
-        goal = db.current_goal()
-        return dataclasses.asdict(goal), HTTPStatus.OK
-    except Exception as error:
-        logger.error('Unhandled exception during current_goal: %s', error)
-        return {'errorMessage': 'unexpected error'}, HTTPStatus.INTERNAL_SERVER_ERROR
+    goal = db.current_goal()
+    return dataclasses.asdict(goal), HTTPStatus.OK
 
 
 def all_meals():
@@ -118,26 +131,16 @@ def save_ingredient():
     ingredient = Ingredient(id=id, label=label, calories=calories, proteins=proteins, serving_size=serving_size)
 
     logger.debug('Adding new ingredient %s', ingredient)
-    try:
-        id = db.save_ingredient(ingredient)
-        return dataclasses.asdict(dataclasses.replace(ingredient, id=id)), HTTPStatus.OK
-
-    except Exception as error:
-        logger.error('Unhandled exception during save_ingredient: %s', error)
-        return {'errorMessage': 'unexpected error'}, HTTPStatus.INTERNAL_SERVER_ERROR
+    id = db.save_ingredient(ingredient)
+    return dataclasses.asdict(dataclasses.replace(ingredient, id=id)), HTTPStatus.OK
 
 
 def delete_ingredient():
     data = request.get_json()
     id = data['id']
     logger.debug('Deleting ingredient id %s', id)
-    try:
-        id = db.delete_ingredient(id)
-        return {}, HTTPStatus.OK
-
-    except Exception as error:
-        logger.error('Unhandled exception during delete_ingredient: %s', error)
-        return {'errorMessage': 'unexpected error'}, HTTPStatus.INTERNAL_SERVER_ERROR
+    id = db.delete_ingredient(id)
+    return {}, HTTPStatus.OK
 
 
 def save_meal():
@@ -163,23 +166,13 @@ def save_meal():
     meal = Meal(None, label, ingredients, calories=calories, protein=protein, meals_created=meals_created, meals_remaining=meals_created)
 
     logger.debug('Adding new meal %s', meal)
-    try:
-        id = db.save_meal(meal)
-        return dataclasses.asdict(dataclasses.replace(meal, id=id)), HTTPStatus.OK
-
-    except Exception as error:
-        logger.error('Unhandled exception during save_meal: %s', error)
-        return {'errorMessage': 'unexpected error'}, HTTPStatus.INTERNAL_SERVER_ERROR
+    id = db.save_meal(meal)
+    return dataclasses.asdict(dataclasses.replace(meal, id=id)), HTTPStatus.OK
 
 
 def delete_meal():
     data = request.get_json()
     id = data['id']
     logger.debug('Deleting meal id %s', id)
-    try:
-        id = db.delete_meal(id)
-        return {}, HTTPStatus.OK
-
-    except Exception as error:
-        logger.error('Unhandled exception during delete_meal: %s', error)
-        return {'errorMessage': 'unexpected error'}, HTTPStatus.INTERNAL_SERVER_ERROR
+    id = db.delete_meal(id)
+    return {}, HTTPStatus.OK

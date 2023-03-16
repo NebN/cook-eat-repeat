@@ -1,7 +1,8 @@
 <template>
   <div>
-    <GoalCard />
-    <MealHistory />
+    <GoalCard/>
+    <ProgressHistory/>
+    <MealHistory/>
   </div>
 </template>
 

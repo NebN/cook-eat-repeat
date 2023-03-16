@@ -1,11 +1,12 @@
 <template>
-  <div>
+  <div >
     <DataTable 
     v-model:selection="selectedMeal" 
     @rowSelect="commitMeals"
     selectionMode="single" 
     dataKey="meals" 
     :value="mealsRows" 
+    :scrollable="false"
     responsiveLayout="scroll">
         
         <template #header>
@@ -41,10 +42,12 @@ import CommitMealsForm from '@/components/cook/CommitMealsForm.vue'
 
 const recipeStore = useRecipeStore()
 
+const maxMeals = 20 // How to make this respond to scrolling :/
+
 const mealsRows = computed(() => {
-  const oneToTen = Array.from(Array(11).keys())
-  oneToTen.splice(0, 1)
-  return oneToTen.map(n => {
+  const range = Array.from(Array(maxMeals + 1).keys())
+  range.splice(0, 1)
+  return range.map(n => {
     return {
       meals: n,
       calories: recipeStore.calories(n),
@@ -76,6 +79,10 @@ const commitMeals = () => {
 }
 </script>
 
-<style scoped>
+<style>
+
+.p-datatable-wrapper {
+  max-height: 25rem;
+}
 
 </style>

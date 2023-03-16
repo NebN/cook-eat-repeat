@@ -53,7 +53,7 @@ def all_meals():
 
 def save_meal(meal):
   res = meals.insert(dataclasses.asdict(meal))
-  return res[0]
+  return res
 
 
 def delete_meal(id):
@@ -70,9 +70,14 @@ def delete_favoruite_meal(id):
 
 
 def all_favourite_meals():
-  regular_meals = all_meals()
-  favourites = document_id_to_id(*favourite_meals.all())
-  []
+  # TODO
+  pass
+
+
+def all_cooked_meals():
+  all_meals = meals.all()
+  all_meals.sort(reverse=True, key=lambda m : m['time_created'])
+  return document_id_to_id(*all_meals)
 
 
 def eat_meal(id):
@@ -99,12 +104,17 @@ def eat_meal(id):
 
 def current_goal():
   all_goals = [Goal(calories=g['calories'], protein=g['protein'], from_day=g['from_day']) for g in goals.all()]
-  return max(all_goals, key=lambda g: util.string_to_date(g.from_day))
+  if len(all_goals) > 0:
+    return max(all_goals, key=lambda g: util.string_to_date(g.from_day))
+  
+  return Goal(calories=0, protein=0)
 
 
 def save_goal(goal):
   current = current_goal()
+  logger.debug('current goal retrieved %s', current)
   if current.calories != goal.calories or current.protein != goal.protein:
+    logger.info('updating current goal to %s', goal)
     res = goals.upsert(dataclasses.asdict(goal), Query().from_day == goal.from_day)
     return res[0]
   else:
@@ -112,12 +122,21 @@ def save_goal(goal):
 
 
 def todays_progress():
-  today = util.date_to_string(date.today())
-  res = days_progress.search(Query().day == today)
+  return day_progress(date.today())
+
+
+def day_progress(day):
+  day_string = util.date_to_string(day)
+  res = days_progress.search(Query().day == day_string)
   
   if len(res) > 0:
     return res[0]
   else:
-    zero = dataclasses.asdict(DayProgress(today, 0, 0))
-    days_progress.insert(zero)
-    return zero
+    days_progress.insert(dataclasses.asdict(DayProgress(day_string, 0, 0)))
+    return day_progress(day) # so doc_id is returned
+
+
+def all_progress():
+  progress = days_progress.all()
+  progress.sort(reverse=True, key=lambda m : m['day'])
+  return document_id_to_id(*progress)

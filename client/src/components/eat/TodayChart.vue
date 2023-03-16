@@ -1,10 +1,16 @@
 <template>
+  <div>
+    <span>
+      <h4>Calories: {{(mealStore.todaysProgress != null ? mealStore.todaysProgress.calories : 0).toFixed()}}{{ (mealStore.selectedMeal != null ? ' -> ' + (mealStore.selectedMeal.calories + mealStore.todaysProgress.calories).toFixed() : null) }} / {{ mealStore.currentGoal.calories }}</h4>
+      <h4>Protein: {{(mealStore.todaysProgress != null ? mealStore.todaysProgress.protein : 0).toFixed(1)}}{{ (mealStore.selectedMeal != null ? ' -> ' + (mealStore.selectedMeal.protein + mealStore.todaysProgress.protein).toFixed(1) : null) }} / {{ mealStore.currentGoal.protein }}</h4>
+    </span>
     <Chart 
     ref="primeChart" 
-    style="height: 100%;" 
+    style="height: 100%; min-height: 360px;" 
     type="bar" 
     :data="chartData" 
     :options="chartOptions" />
+  </div>
 </template>
 
 <script setup> 
@@ -43,14 +49,6 @@ const chartData = computed(() =>({
 const chartOptions = ref({
   maintainAspectRatio: false,
   plugins: {
-    title: {
-      display: true,
-      text: 'Calories and protein intake for today',
-      padding: {
-          top: 10,
-          bottom: 30
-      }
-    }
   }
 })
 </script>

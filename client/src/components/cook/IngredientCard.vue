@@ -16,7 +16,7 @@
       </template>
 
       <template #content>
-        <Button icon="pi pi-plus" @click="addIngredient(selectedIngredient)" label="Add to meal" />
+        <Button icon="pi pi-plus" @click="$emit('addIngredient')" label="Add to meal" />
       </template>
     </Card>
   </div>
@@ -29,16 +29,16 @@ import axios from 'axios'
 import { useDialog } from 'primevue/usedialog'
 import { useConfirm } from 'primevue/useconfirm'
 import IngredientForm from '@/components/cook/IngredientForm'
-import IngredientAmountForm from '@/components/cook/IngredientAmountForm'
 import { useIngredientStore } from '@/script/stores/ingredientStore'
-import { useRecipeStore } from '@/script/stores/recipeStore'
 
+
+// eslint-disable-next-line
+const emit = defineEmits(['addIngredient'])
 
 const dialog = useDialog()
 const confirm = useConfirm()
 
 const ingredientStore = useIngredientStore()
-const recipeStore = useRecipeStore()
 const { selectedIngredient } = storeToRefs(ingredientStore)
 
 const favouriteIcon = computed(() => selectedIngredient.value.favourite == null ? 'pi pi-spin pi-spinner' : selectedIngredient.value.favourite ? 'pi pi-heart-fill' : 'pi pi-heart')
@@ -136,31 +136,6 @@ const deleteItem = () => {
   });
 }
 
-const addIngredient = (ingredient) => {
-  dialog.open(IngredientAmountForm, {
-    props: {
-      header: title.value,
-      style: {
-          width: '80%',
-          maxWidth: '600px'
-      },
-    },
-    modal: true,
-    data: {
-      ingredient: ingredient,
-    },
-    onClose: (item) => {
-      if (item.data != null) {
-        const data = item.data
-        const recipeIngredient = {
-          ...ingredient,
-          ...data
-        }
-        recipeStore.addIngredient(recipeIngredient)
-      }
-    }
-  })
-}
 </script>
 
 <style scoped>

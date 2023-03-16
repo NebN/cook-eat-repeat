@@ -2,7 +2,7 @@
   <div class="card">
     <div class="input-block">
       <span class="p-float-label">
-          <InputText id="label" type="text" v-model="label" />
+          <InputText id="label" type="text" v-model="label" autofocus/>
           <label for="label">Name</label>
       </span>
     </div>
@@ -58,7 +58,7 @@ const confirmEdit = () => {
       label: label.value,
       calories: calories.value,
       proteins: proteins.value,
-      serving_size: serving_size.value,
+      serving_size: serving_size.value || null,
     })
 }
 const cancelEdit = () => {
