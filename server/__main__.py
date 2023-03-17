@@ -9,4 +9,4 @@ LOGGING_CONF_PATH = os.path.join(ROOT_DIR, 'logging.conf')
 logging.config.fileConfig(LOGGING_CONF_PATH)
 
 if __name__ == '__main__':
-  app.run(host='0.0.0.0')
+  app.run(host='0.0.0.0', port='5000')

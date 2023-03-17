@@ -55,7 +55,18 @@ import GoalCard from './components/repeat/GoalCard'
 import MealHistory from './components/repeat/MealHistory'
 import ProgressHistory from './components/repeat/ProgressHistory'
 
-axios.defaults.baseURL = 'http://localhost:5000'
+const env = process.env.NODE_ENV || 'development'
+
+
+const addr = {
+  production: '',
+  development: 'http://localhost:5000',
+};
+
+axios.defaults.baseURL = addr[env]
+axios.defaults.headers.common['x-api-key'] = 'TODO'
+
+console.log(process.env.NODE_ENV)
 
 const routes = [
   {
