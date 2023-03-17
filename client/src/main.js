@@ -66,8 +66,6 @@ const addr = {
 axios.defaults.baseURL = addr[env]
 axios.defaults.headers.common['x-api-key'] = 'TODO'
 
-console.log(process.env.NODE_ENV)
-
 const routes = [
   {
     path: '/',

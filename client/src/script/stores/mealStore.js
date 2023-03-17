@@ -29,7 +29,6 @@ export const useMealStore = defineStore('meals', {
       this.allProgress = all
       const respMealHistory = await axios.get('/api/meal/history')
       const mealHistory = respMealHistory.data
-      console.log(mealHistory)
       this.mealHistory = mealHistory
     },
     async eatMeal(meal) {
