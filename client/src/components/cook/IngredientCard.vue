@@ -12,7 +12,7 @@
       </template>
 
       <template #subtitle>
-        {{ selectedIngredient.calories }} cal, {{ selectedIngredient.proteins }}g protein
+        {{ selectedIngredient.calories }} cal, {{ selectedIngredient.protein }}g protein
       </template>
 
       <template #content>
@@ -97,7 +97,7 @@ const editItem = () => {
 
           selectedIngredient.value.label = response.data.label
           selectedIngredient.value.calories = response.data.calories
-          selectedIngredient.value.proteins = response.data.proteins
+          selectedIngredient.value.protein = response.data.protein
           selectedIngredient.value.serving_size = response.data.serving_size
         } catch (error) {
           errorMessage.value = 'Unable to update ingredient 😢. Please try again later.'

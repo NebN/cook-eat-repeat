@@ -27,12 +27,6 @@
       </template>
     </Column>
 
-    <Column header="Meals">
-      <template #body>
-          link to meals
-      </template>
-    </Column>
-
   </DataTable>
 </template>
 

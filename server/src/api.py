@@ -13,6 +13,7 @@ CORS(app, resources={r"/api/*": {"origins": ['http://localhost:8080', 'http://19
 
 logger = logging.getLogger()
 
+
 def error_managed(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -89,13 +90,22 @@ def all_progress():
 
 @app.route('/api/ingredient/favourite', methods=['POST'])
 @error_managed
-def set_favourite():
+def set_favourite_ingredient():
     data = request.get_json()
     id = data['id']
-    logger.debug('Toggling favourite for id=%s', id)
-    res = db.toggle_favourite(id=id)
+    logger.debug('Toggling favourite ingredient for id=%s', id)
+    res = db.toggle_favourite_ingredient(id=id)
     return {'newFavourite': res}, HTTPStatus.OK
-        
+
+
+@app.route('/api/meal/favourite', methods=['POST'])
+@error_managed
+def set_favourite_meal():
+    data = request.get_json()
+    id = data['id']
+    logger.debug('Toggling favourite meal for id=%s', id)
+    res = db.toggle_favourite_meal(id=id)
+    return {'newFavourite': res}, HTTPStatus.OK     
 
 def save_goal():
     data = request.get_json()
@@ -122,13 +132,12 @@ def all_ingredients():
 
 def save_ingredient():
     data = request.get_json()
-    id = data.get('id', None)
     label = data['label']
     calories = data['calories']
-    proteins = data['proteins']
+    protein = data['protein']
     serving_size = data['serving_size']
 
-    ingredient = Ingredient(id=id, label=label, calories=calories, proteins=proteins, serving_size=serving_size)
+    ingredient = Ingredient(label=label, calories=calories, protein=protein, serving_size=serving_size)
 
     logger.debug('Adding new ingredient %s', ingredient)
     id = db.save_ingredient(ingredient)
@@ -149,25 +158,24 @@ def save_meal():
     calories = data['calories']
     protein = data['protein']
     meals_created = data['meals_created']
-    logger.info(data)
     ingredients = [(
         Ingredient(
-            id=i['id'],
             label=i['label'],
             calories=i['calories'],
-            proteins=i['protein'],
+            protein=i['protein'],
             serving_size=i['serving_size']), 
         Amount(
             grams=i['grams'], 
-            servings=i['servings'])) for i in data['ingredients']
+            servings=i['servings'],
+            per_meal=i['per_meal'])) for i in data['ingredients']
     ]
 
 
-    meal = Meal(None, label, ingredients, calories=calories, protein=protein, meals_created=meals_created, meals_remaining=meals_created)
+    meal = Meal(label, ingredients, calories=calories, protein=protein, meals_created=meals_created, meals_remaining=meals_created)
 
     logger.debug('Adding new meal %s', meal)
     id = db.save_meal(meal)
-    return dataclasses.asdict(dataclasses.replace(meal, id=id)), HTTPStatus.OK
+    return dataclasses.asdict(meal), HTTPStatus.OK
 
 
 def delete_meal():

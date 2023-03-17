@@ -35,7 +35,7 @@
       </Column>
       <Column>
         <template #body="slotProps">
-            <div v-if="slotProps.data.id != null">
+            <div >
                 <Button @click="deleteIngredient(slotProps.data)" icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" style="float: right" />
                 <Button @click="editIngredient(slotProps.data)" icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-secondary" style="float: right" />
             </div>
@@ -57,7 +57,7 @@ const recipeStore = useRecipeStore()
 const dialog = useDialog()
 
 const rowClass = ref((rowIngredient) => {
-  if (rowIngredient.perMeal) {
+  if (rowIngredient.per_meal) {
     return 'per-meal'
   }
 })
@@ -84,7 +84,7 @@ const editIngredient = (ingredient) => {
         ingredient.calories = data.calories
         ingredient.protein = data.protein
         ingredient.ratio = data.ratio
-        ingredient.perMeal = data.perMeal
+        ingredient.per_meal = data.per_meal
       }
     }
   })

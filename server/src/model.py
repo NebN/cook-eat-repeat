@@ -6,10 +6,9 @@ from src import util
 
 @dataclass
 class Ingredient:
-  id: int 
   label: str
   calories: Decimal
-  proteins: Decimal
+  protein: Decimal
   serving_size: Decimal
   favourite: bool = False
 
@@ -18,11 +17,11 @@ class Ingredient:
 class Amount:
   grams: int
   servings: int
+  per_meal: bool = False
 
 
 @dataclass
 class Meal:
-  id: int 
   label: str
   ingredients: list[(Ingredient, Amount)]
   calories: Decimal
@@ -31,6 +30,7 @@ class Meal:
   meals_remaining: int
   time_created: str = util.date_to_string(datetime.datetime.now())
   times_eaten: list[str] = field(default_factory=lambda: [])
+  favourite: bool = False
 
 
 @dataclass

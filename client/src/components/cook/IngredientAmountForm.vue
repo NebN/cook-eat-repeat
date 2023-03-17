@@ -35,7 +35,7 @@ onMounted(() => {
   const inputIngredient = dialogRef.value.data.ingredient
   ingredient.value = inputIngredient
 
-  if (inputIngredient.perMeal) {
+  if (inputIngredient.per_meal) {
     selectedAddMode.value = addModes.value[1]
   }
 
@@ -54,7 +54,7 @@ const confirm = () => {
     grams: computedGrams.value,
     servings: servings(),
     ratio: ratio(),
-    perMeal: perMeal()
+    per_meal: per_meal()
   })
 }
 
@@ -74,7 +74,7 @@ const computedCalories = computed(() => {
 })
 
 const computedProtein = computed(() =>  {
-  return computedGrams.value * ingredient.value.proteins / 100
+  return computedGrams.value * ingredient.value.protein / 100
 })
 
 const servings = () => {
@@ -88,7 +88,7 @@ const ratio = () => {
   return (computedProtein.value / computedCalories.value) * 25 // 4 calories for 1 protein (100/4=25)
 }
 
-const perMeal = () => {
+const per_meal = () => {
   return selectedAddMode.value == addModes.value[1]
 }
 

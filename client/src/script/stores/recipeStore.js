@@ -8,16 +8,17 @@ export const useRecipeStore = defineStore('recipes', {
   actions: {
     addIngredient(ingredient) {
       if (this.selectedRecipe == null) {
-        this.startNewRecipe()
+        this.startNewRecipe(null)
       }
       this.selectedRecipe.ingredients.push(ingredient)
     },
     deleteIngredient(ingredient) {
-      this.selectedRecipe.ingredients = this.selectedRecipe.ingredients.filter(function(e) {return e.id != ingredient.id})
+      this.selectedRecipe.ingredients = this.selectedRecipe.ingredients.filter(function(e) {return e.label != ingredient.label})
     },
-    startNewRecipe() {
+    startNewRecipe(label) {
       this.selectedRecipe = {
-        ingredients: []
+        ingredients: [],
+        label: label
       }
     }
   },
@@ -31,7 +32,7 @@ export const useRecipeStore = defineStore('recipes', {
     calories() {
       return (numberOfMeals) => {
         return this.currentIngredients.map(i => {
-          if (i.perMeal) {
+          if (i.per_meal) {
             return i.calories
           } else {
             return i.calories / numberOfMeals
@@ -42,7 +43,7 @@ export const useRecipeStore = defineStore('recipes', {
     protein() {
       return (numberOfMeals) => {
         return this.currentIngredients.map(i => {
-          if (i.perMeal) {
+          if (i.per_meal) {
             return i.protein
           } else {
             return i.protein / numberOfMeals
@@ -53,7 +54,7 @@ export const useRecipeStore = defineStore('recipes', {
     grams() {
       return (numberOfMeals) => {
         return this.currentIngredients.map(i => {
-          if (i.perMeal) {
+          if (i.per_meal) {
             return i.grams
           } else {
             return i.grams / numberOfMeals

@@ -21,14 +21,18 @@ export const useMealStore = defineStore('meals', {
       const respGoal = await axios.get('/api/goal')
       const goal = respGoal.data
       this.currentGoal =  goal
+
       const respToday = await axios.get('/api/goal/today')
       const today = respToday.data
       this.todaysProgress = today
+
       const respAll = await axios.get('/api/goal/all')
       const all = respAll.data
       this.allProgress = all
+
       const respMealHistory = await axios.get('/api/meal/history')
       const mealHistory = respMealHistory.data
+      mealHistory.sort((a, b) => Number(b.favourite) - Number(a.favourite))
       this.mealHistory = mealHistory
     },
     async eatMeal(meal) {
@@ -40,7 +44,7 @@ export const useMealStore = defineStore('meals', {
         })
       })
       
-      const data = resp.data 
+      const data = resp.data
 
       if (data.meals_remaining <= 0) {
         this.meals = this.meals.filter(m => m.id != data.id)

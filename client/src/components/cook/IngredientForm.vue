@@ -15,8 +15,8 @@
       </div>
       <div class="input-block">
           <span class="p-float-label">
-            <InputText id="proteins" type="number" v-model="proteins" />
-            <label for="proteins">Protein (100g)</label>
+            <InputText id="protein" type="number" v-model="protein" />
+            <label for="protein">Protein (100g)</label>
         </span>
       </div>
     </div>
@@ -39,7 +39,7 @@ const item = ref({})
 
 const label = ref(null)
 const calories = ref(null)
-const proteins = ref(null)
+const protein = ref(null)
 const serving_size = ref(null)
 
 onMounted(() => {
@@ -47,7 +47,7 @@ onMounted(() => {
     item.value = dialogRef.value.data.item
     label.value = item.value.label
     calories.value = item.value.calories
-    proteins.value = item.value.proteins
+    protein.value = item.value.protein
     serving_size.value = item.value.serving_size
   }
 })
@@ -57,7 +57,7 @@ const confirmEdit = () => {
       id: item.value.id,
       label: label.value,
       calories: calories.value,
-      proteins: proteins.value,
+      protein: protein.value,
       serving_size: serving_size.value || null,
     })
 }

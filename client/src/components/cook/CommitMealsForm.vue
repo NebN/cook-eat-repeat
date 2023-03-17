@@ -3,12 +3,12 @@
     <div v-if="recipe != null">Each one for {{recipe.calories.toFixed()}} calories and {{recipe.protein.toFixed(1)}} protein.</div>
     <div class="input-block">
       <span class="p-float-label">
-        <InputText id="label" type="text" v-model="label" />
+        <InputText id="label" type="text" v-model="recipeStore.selectedRecipe.label" />
         <label for="label">Meal name</label>
       </span>
 
     </div>
-    <ConfirmOrCancel v-if="label != null && label.length > 0" @confirm="confirmCommit" @cancel="cancelCommit"/>
+    <ConfirmOrCancel v-if="recipeStore.selectedRecipe.label != null && recipeStore.selectedRecipe.label.length > 0" @confirm="confirmCommit" @cancel="cancelCommit"/>
   </div>
 </template>
 
@@ -22,7 +22,6 @@ const recipeStore = useRecipeStore()
 
 const dialogRef = inject('dialogRef')
 const recipe = ref()
-const label = ref()
 
 
 onMounted(() => {
@@ -37,7 +36,7 @@ const confirmCommit = async () => {
       method: 'post',
       url: '/api/meal',
       data: ({
-        label: label.value || null,
+        label: recipeStore.selectedRecipe.label,
         calories: recipe.value.calories,
         protein: recipe.value.protein,
         meals_created: recipe.value.meals,

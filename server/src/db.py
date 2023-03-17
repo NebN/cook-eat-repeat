@@ -10,7 +10,6 @@ from src.model import Goal, DayProgress
 db = TinyDB(os.path.join(sys.path[0], 'database.db'))
 ingredients = db.table('ingredients')
 meals = db.table('meals')
-favourite_meals = db.table('favourite_meals')
 goals = db.table('goals')
 days_progress = db.table('days_progress')
 
@@ -29,13 +28,28 @@ def all_ingredients():
   return document_id_to_id(*ingredients.all())
 
 
-def toggle_favourite(id):
+def toggle_favourite_ingredient(id):
   def toggle(doc):
     doc['favourite'] = not doc['favourite']
     return doc
     
   ingredients.update(toggle, doc_ids=[id])
   return ingredients.get(doc_id=id)['favourite']
+
+
+def toggle_favourite_meal(id):
+  def toggle(doc):
+    if 'favourite' in doc:
+      doc['favourite'] = not doc.get('favourite')
+      logger.info('favourite found in doc %s', doc)
+    else:
+      doc['favourite'] = True
+      logger.info('favourite not found in doc %s', doc)
+    return doc
+    
+  logger.info('looiking for id %s', id)
+  meals.update(toggle, doc_ids=[id])
+  return meals.get(doc_id=id)['favourite']
 
 
 def save_ingredient(ingredient):
@@ -58,20 +72,6 @@ def save_meal(meal):
 
 def delete_meal(id):
   meals.remove(doc_ids=[id])
-
-
-def save_favoruite_meal(favoruite_meal):
-  res = favourite_meals.upsert(dataclasses.asdict(favoruite_meal), Query().label == favoruite_meal.label)
-  return res[0]
-
-
-def delete_favoruite_meal(id):
-  favourite_meals.remove(doc_ids=[id])
-
-
-def all_favourite_meals():
-  # TODO
-  pass
 
 
 def all_cooked_meals():
@@ -118,7 +118,7 @@ def save_goal(goal):
     res = goals.upsert(dataclasses.asdict(goal), Query().from_day == goal.from_day)
     return res[0]
   else:
-    logger.info('Not updatating goal to %s as it is the same as the current goal %s', goal, current)
+    logger.info('not updatating goal to %s as it is the same as the current goal %s', goal, current)
 
 
 def todays_progress():
