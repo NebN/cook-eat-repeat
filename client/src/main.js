@@ -2,6 +2,8 @@ import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import App from './App.vue'
 
+import axios from 'axios'
+
 import { createPinia } from 'pinia'
 
 import PrimeVue from 'primevue/config'
@@ -53,6 +55,7 @@ import GoalCard from './components/repeat/GoalCard'
 import MealHistory from './components/repeat/MealHistory'
 import ProgressHistory from './components/repeat/ProgressHistory'
 
+axios.defaults.baseURL = 'http://localhost:5000'
 
 const routes = [
   {

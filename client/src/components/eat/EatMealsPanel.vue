@@ -65,7 +65,7 @@ const selectedMeal = ref()
 onMounted(async () => {
   if (mealStore.meals.length == 0) {
     try {
-      const response = await axios.get('http://192.168.1.23:5000/api/meal')
+      const response = await axios.get('/api/meal')
       const meals = response.data
       meals.sort((a, b) => b.protein - a.protein)
       mealStore.$patch(store => store.meals = meals)

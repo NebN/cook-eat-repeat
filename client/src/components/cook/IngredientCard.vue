@@ -57,7 +57,7 @@ const toggleFavourite = async () => {
   try {
     const response = await axios({
       method: 'post',
-      url: 'http://192.168.1.23:5000/api/ingredient/favourite',
+      url: '/api/ingredient/favourite',
       data: {
         id: selectedIngredient.value.id
       }
@@ -91,7 +91,7 @@ const editItem = () => {
         try {
           const response = await axios({
             method: 'post',
-            url: 'http://192.168.1.23:5000/api/ingredient',
+            url: '/api/ingredient',
             data: data.data
           })
 
@@ -116,7 +116,7 @@ const deleteItem = () => {
         try {
           await axios({
             method: 'delete',
-            url: 'http://192.168.1.23:5000/api/ingredient',
+            url: '/api/ingredient',
             data: {
               id: selectedIngredient.value.id
             }

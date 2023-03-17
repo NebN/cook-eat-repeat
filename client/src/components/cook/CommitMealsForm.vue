@@ -35,7 +35,7 @@ const confirmCommit = async () => {
   try {
     await axios({
       method: 'post',
-      url: 'http://192.168.1.23:5000/api/meal',
+      url: '/api/meal',
       data: ({
         label: label.value || null,
         calories: recipe.value.calories,

@@ -18,16 +18,16 @@ export const useMealStore = defineStore('meals', {
   }),
   actions: {
     async initGoal() {
-      const respGoal = await axios.get('http://192.168.1.23:5000/api/goal')
+      const respGoal = await axios.get('/api/goal')
       const goal = respGoal.data
       this.currentGoal =  goal
-      const respToday = await axios.get('http://192.168.1.23:5000/api/goal/today')
+      const respToday = await axios.get('/api/goal/today')
       const today = respToday.data
       this.todaysProgress = today
-      const respAll = await axios.get('http://192.168.1.23:5000/api/goal/all')
+      const respAll = await axios.get('/api/goal/all')
       const all = respAll.data
       this.allProgress = all
-      const respMealHistory = await axios.get('http://192.168.1.23:5000/api/meal/history')
+      const respMealHistory = await axios.get('/api/meal/history')
       const mealHistory = respMealHistory.data
       console.log(mealHistory)
       this.mealHistory = mealHistory
@@ -35,7 +35,7 @@ export const useMealStore = defineStore('meals', {
     async eatMeal(meal) {
       const resp = await axios({
         method: 'post',
-        url: 'http://192.168.1.23:5000/api/meal/eat',
+        url: '/api/meal/eat',
         data: ({
           id: meal.id
         })
@@ -58,7 +58,7 @@ export const useMealStore = defineStore('meals', {
     async deleteMeal(meal) {
       await axios({
         method: 'delete',
-        url: 'http://192.168.1.23:5000/api/meal',
+        url: '/api/meal',
         data: ({
           id: meal.id
         })
@@ -68,7 +68,7 @@ export const useMealStore = defineStore('meals', {
     async updateGoal(goal) {
       await axios({
         method: 'post',
-        url: 'http://192.168.1.23:5000/api/goal',
+        url: '/api/goal',
         data: {
           calories: goal.calories,
           protein: goal.protein

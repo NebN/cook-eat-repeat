@@ -43,7 +43,7 @@ const listboxRef = ref(null)
 onMounted(async () => {
   if (ingredientStore.ingredients.length == 0) {
     try {
-      const response = await axios.get('http://192.168.1.23:5000/api/ingredient')
+      const response = await axios.get('/api/ingredient')
       const ingredients = response.data
       ingredients.sort((a, b) => Number(b.favourite) - Number(a.favourite))
       ingredientStore.$patch(store => store.ingredients = ingredients)
@@ -74,7 +74,7 @@ const newIngredient = () => {
         try {
           const response = await axios({
             method: 'post',
-            url: 'http://192.168.1.23:5000/api/ingredient',
+            url: '/api/ingredient',
             data: data.data
           })
 
