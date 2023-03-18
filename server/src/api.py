@@ -142,8 +142,8 @@ def save_ingredient():
     ingredient = Ingredient(label=label, calories=calories, protein=protein, serving_size=serving_size)
 
     logger.debug('Adding new ingredient %s', ingredient)
-    id = db.save_ingredient(ingredient)
-    return dataclasses.asdict(dataclasses.replace(ingredient, id=id)), HTTPStatus.OK
+    db.save_ingredient(ingredient)
+    return dataclasses.asdict(ingredient), HTTPStatus.OK
 
 
 def delete_ingredient():
