@@ -39,7 +39,7 @@ const confirmCommit = async () => {
         label: recipeStore.selectedRecipe.label,
         calories: recipe.value.calories,
         protein: recipe.value.protein,
-        meals_created: recipe.value.meals,
+        meals_remaining: recipe.value.meals,
         ingredients: recipeStore.currentIngredients
       })
     })

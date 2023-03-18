@@ -159,7 +159,7 @@ def save_meal():
     label = data['label']
     calories = data['calories']
     protein = data['protein']
-    meals_created = data['meals_created']
+    meals_remaining = data['meals_remaining']
     ingredients = [(
         Ingredient(
             label=i['label'],
@@ -173,7 +173,7 @@ def save_meal():
     ]
 
 
-    meal = Meal(label, ingredients, calories=calories, protein=protein, meals_created=meals_created, meals_remaining=meals_created)
+    meal = Meal(label, ingredients, calories=calories, protein=protein, meals_remaining=meals_remaining)
 
     logger.debug('Adding new meal %s', meal)
     db.save_meal(meal)

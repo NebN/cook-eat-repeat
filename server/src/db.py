@@ -3,6 +3,7 @@ import sys
 import dataclasses
 from datetime import datetime, date
 from tinydb import TinyDB, Query
+from tinydb.operations import delete
 import logging
 from src import util
 from src.model import Goal, DayProgress
@@ -53,7 +54,7 @@ def toggle_favourite_meal(id):
 
 
 def save_ingredient(ingredient):
-  res = ingredients.upsert(dataclasses.asdict(ingredient), Query().label == ingredient.label)
+  res = ingredients.upsert(ingredient.to_dict(), Query().label == ingredient.label)
   return res[0]
     
 
@@ -66,7 +67,7 @@ def all_meals():
 
 
 def save_meal(meal):
-  res = meals.insert(dataclasses.asdict(meal))
+  res = meals.insert(meal.to_dict())
   return res
 
 
@@ -87,6 +88,8 @@ def eat_meal(id, date):
 
   meals.update(eat, doc_ids=[id])
   meal = meals.get(doc_id=id)
+
+  meal.pop('favourite',  None)
 
   progress = day_progress(date)
   progress['meals'] = progress['meals'] + [meal]
@@ -114,7 +117,7 @@ def save_goal(goal):
   logger.debug('current goal retrieved %s', current)
   if current.calories != goal.calories or current.protein != goal.protein:
     logger.info('updating current goal to %s', goal)
-    res = goals.upsert(dataclasses.asdict(goal), Query().from_day == goal.from_day)
+    res = goals.upsert(goal.to_dict(), Query().from_day == goal.from_day)
     return res[0]
   else:
     logger.info('not updatating goal to %s as it is the same as the current goal %s', goal, current)
@@ -131,7 +134,7 @@ def day_progress(day):
   if len(res) > 0:
     return res[0]
   else:
-    days_progress.insert(dataclasses.asdict(DayProgress(day_string, 0, 0)))
+    days_progress.insert(DayProgress(day_string, 0, 0).to_dict())
     return day_progress(day) # so doc_id is returned
 
 

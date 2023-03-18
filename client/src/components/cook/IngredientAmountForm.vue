@@ -34,8 +34,6 @@ let proteinPer1Gram = 0
 onMounted(() => {
   quantity.value = null
 
-
-
   const inputIngredient = dialogRef.value.data.ingredient
   ingredient.value = inputIngredient
 
