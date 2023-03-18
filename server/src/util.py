@@ -11,4 +11,4 @@ def string_to_datetime(d):
 
 
 def string_to_date(d):
-  return date.fromisoformat(d)
+  return date.fromisoformat(d[0:10])

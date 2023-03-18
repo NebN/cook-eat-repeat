@@ -75,6 +75,7 @@ const errorClosed = () => errorMessage.value = null
 const editItem = () => {
   dialog.open(IngredientForm, {
     props: {
+      modal: true,
       header: title.value,
       style: {
           width: '80%',
@@ -82,7 +83,6 @@ const editItem = () => {
       },
       
     },
-    modal: true,
     data: {
       item: selectedIngredient.value,
     },

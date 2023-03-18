@@ -65,6 +65,7 @@ const rowClass = ref((rowIngredient) => {
 const editIngredient = (ingredient) => {
   dialog.open(IngredientAmountForm, {
     props: {
+      modal: true,
       header: ingredient.label,
       style: {
           width: '80%',
@@ -72,7 +73,6 @@ const editIngredient = (ingredient) => {
       },
       
     },
-    modal: true,
     data: {
       ingredient: ingredient,
     },

@@ -36,14 +36,6 @@
       </template>
     </Column>
 
-    <template #expansion="slotProps">
-      <div>
-        <div>Eating {{ slotProps.data.label }} will bring you to a total of</div>
-        <div> {{ slotProps.data.calories.toFixed() }} calories and {{ slotProps.data.protein.toFixed(1) }} protein</div>
-        <Button type="button" label="Eat" @click="eat(slotProps.data)" class="p-button-primary" style="margin-top: 0.5rem" />
-      </div>
-    </template>
-
   </DataTable>
 </template>
 
@@ -53,11 +45,12 @@ import axios from 'axios'
 import { useMealStore } from '@/script/stores/mealStore'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
+import { useDialog } from 'primevue/usedialog'
+import CommitEatingForm from '@/components/eat/CommitEatingForm.vue'
 
 const confirm = useConfirm()
 const toast = useToast()
 const mealStore = useMealStore()
-const expandedRows = ref()
 const rowClass = ref(() => '')
 
 const selectedMeal = ref()
@@ -79,15 +72,24 @@ const onRowSelect = (row) => {
   mealStore.selectMeal(row.data)
 }
 
-const eat = async (meal) => {
-  try {
-    await mealStore.eatMeal(meal)
-    expandedRows.value = []
-    toast.add({severity:'success', summary: 'Nom!', detail:'Meal has been eaten.', life: 3000})
-  } catch (error) {
-    console.log(error)
-    toast.add({severity:'error', summary: 'Error!', detail:'Unable to eat meal 😢. Try again later.', life: 3000})
-  }
+const dialog = useDialog()
+const eat = () => {
+  dialog.open(CommitEatingForm, {
+    props: {
+      modal: true,
+      header: 'Eat' + selectedMeal.value.label + '?',
+      style: {
+          width: '80%',
+          maxWidth: '600px'
+      },
+      
+    },
+    data: {
+      meal: selectedMeal.value
+    },
+    onClose: () => {
+    }
+  })
 }
 
 const deleteMeal = async (meal) => {

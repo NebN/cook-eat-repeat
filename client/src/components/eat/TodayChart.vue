@@ -1,8 +1,8 @@
 <template>
   <div>
     <span>
-      <h4>Calories: {{(mealStore.todaysProgress != null ? mealStore.todaysProgress.calories : 0).toFixed()}}{{ (mealStore.selectedMeal != null ? ' -> ' + (mealStore.selectedMeal.calories + mealStore.todaysProgress.calories).toFixed() : null) }} / {{ mealStore.currentGoal.calories }}</h4>
-      <h4>Protein: {{(mealStore.todaysProgress != null ? mealStore.todaysProgress.protein : 0).toFixed(1)}}{{ (mealStore.selectedMeal != null ? ' -> ' + (mealStore.selectedMeal.protein + mealStore.todaysProgress.protein).toFixed(1) : null) }} / {{ mealStore.currentGoal.protein }}</h4>
+      <h4 style="margin-left: 1rem">Calories: {{(mealStore.todaysProgress != null ? mealStore.todaysProgress.calories : 0).toFixed()}}{{ (mealStore.selectedMeal != null ? ' -> ' + (mealStore.selectedMeal.calories + mealStore.todaysProgress.calories).toFixed() : null) }} / {{ mealStore.currentGoal.calories }}</h4>
+      <h4 style="margin-left: 1rem">Protein: {{(mealStore.todaysProgress != null ? mealStore.todaysProgress.protein : 0).toFixed(1)}}{{ (mealStore.selectedMeal != null ? ' -> ' + (mealStore.selectedMeal.protein + mealStore.todaysProgress.protein).toFixed(1) : null) }} / {{ mealStore.currentGoal.protein }}</h4>
     </span>
     <Chart 
     ref="primeChart" 

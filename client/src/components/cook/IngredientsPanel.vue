@@ -57,13 +57,13 @@ const dialog = useDialog()
 const newIngredient = () => {
   dialog.open(IngredientForm, {
     props: {
+      modal: true,
       header: 'New Ingredient',
       style: {
           width: '80%',
           maxWidth: '600px'
       },
     },
-    modal: true,
     data: { 
       item: {
         label: listboxRef.value.filterValue 
@@ -107,13 +107,13 @@ const onEnter = () => {
 const addIngredient = () => {
   dialog.open(IngredientAmountForm, {
     props: {
+      modal: true,
       header: ingredientStore.selectedIngredient.label + (ingredientStore.selectedIngredient.serving_size != null ? ' ('+ingredientStore.selectedIngredient.serving_size+'g)' : ''),
       style: {
           width: '80%',
           maxWidth: '600px'
       },
     },
-    modal: true,
     data: {
       ingredient: ingredientStore.selectedIngredient,
     },

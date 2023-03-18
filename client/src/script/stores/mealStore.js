@@ -35,28 +35,32 @@ export const useMealStore = defineStore('meals', {
       mealHistory.sort((a, b) => Number(b.favourite) - Number(a.favourite))
       this.mealHistory = mealHistory
     },
-    async eatMeal(meal) {
+    async eatMeal(meal, date) {
+      const asd = {
+        id: meal.id,
+        date: date.toISOString()
+      }
+
       const resp = await axios({
         method: 'post',
         url: '/api/meal/eat',
-        data: ({
-          id: meal.id
-        })
+        data: asd
       })
       
+      this.selectedMeal = null
+
       const data = resp.data
 
       if (data.meals_remaining <= 0) {
         this.meals = this.meals.filter(m => m.id != data.id)
       } else {
         meal.meals_remaining = data.meals_remaining
-        meal.times_eaten = data.times_eaten
       }
-      
-      this.todaysProgress.calories = data.progress.calories
-      this.todaysProgress.protein = data.progress.protein
 
-      this.selectedMeal = null
+      if (date.toDateString() == new Date().toDateString) {
+        this.todaysProgress.calories = data.progress.calories
+        this.todaysProgress.protein = data.progress.protein
+      }
     },
     async deleteMeal(meal) {
       await axios({

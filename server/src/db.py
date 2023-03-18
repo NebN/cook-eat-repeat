@@ -80,25 +80,24 @@ def all_cooked_meals():
   return document_id_to_id(*all_meals)
 
 
-def eat_meal(id):
+def eat_meal(id, date):
   def eat(doc):
-    doc['times_eaten'] = doc['times_eaten'] + [util.date_to_string(datetime.now())]
     doc['meals_remaining'] = doc['meals_remaining'] - 1
     return doc
 
   meals.update(eat, doc_ids=[id])
   meal = meals.get(doc_id=id)
 
-  today = todays_progress()
-  today['meals'] = today['meals'] + [meal]
-  today['calories'] = today['calories'] + meal['calories']
-  today['protein'] = today['protein'] + meal['protein']
+  progress = day_progress(date)
+  progress['meals'] = progress['meals'] + [meal]
+  progress['calories'] = progress['calories'] + meal['calories']
+  progress['protein'] = progress['protein'] + meal['protein']
 
-  days_progress.update(today, doc_ids=[today.doc_id])
+  days_progress.update(progress, doc_ids=[progress.doc_id])
 
   return {
     **document_id_to_id(meal)[0],
-    **{'progress': today}
+    **{'progress': progress}
   }
 
 

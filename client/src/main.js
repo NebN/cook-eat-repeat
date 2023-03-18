@@ -37,6 +37,7 @@ import ToggleButton from 'primevue/togglebutton'
 import Column from 'primevue/column'
 import Toast from 'primevue/toast'
 import Chart from 'primevue/chart'
+import Calendar from 'primevue/calendar'
 
 import ConfirmOrCancel from './components/ConfirmOrCancel'
 
@@ -136,6 +137,7 @@ createApp(App)
 .component('Toast', Toast)
 .component('ToggleButton', ToggleButton)
 .component('Chart', Chart)
+.component('Calendar', Calendar)
 .component('IngredientsPanel', IngredientsPanel)
 .component('RecipePanel', RecipePanel)
 .component('IngredientCard', IngredientCard)

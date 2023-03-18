@@ -62,6 +62,7 @@ const dialog = useDialog()
 const commitMeals = () => {
   dialog.open(CommitMealsForm, {
     props: {
+      modal: true,
       header: selectedMeal.value.meals + ' meals',
       style: {
           width: '80%',
@@ -69,7 +70,6 @@ const commitMeals = () => {
       },
       
     },
-    modal: true,
     data: {
       recipe: selectedMeal.value
     },
@@ -79,7 +79,7 @@ const commitMeals = () => {
 }
 </script>
 
-<style>
+<style scoped>
 
 .p-datatable-wrapper {
   max-height: 25rem;

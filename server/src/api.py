@@ -7,6 +7,7 @@ import dataclasses
 import logging
 from src import db as db
 from src.model import Ingredient, Amount, Meal, Goal
+from src import util
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": ['http://localhost:8080', 'http://192.168.1.*:.*']}})
@@ -60,8 +61,9 @@ def meal_history():
 def eat_meal():
     data = request.get_json()
     id = data['id']
-    logger.debug('Eating meal id %s', id)
-    update = db.eat_meal(id)
+    date = util.string_to_date(data['date'])
+    logger.debug('Eating meal id %s on day %s', id, date)
+    update = db.eat_meal(id, date)
     return update, HTTPStatus.OK
 
 
@@ -112,7 +114,7 @@ def save_goal():
     calories = data['calories']
     protein = data['protein']
     goal = Goal(calories, protein)
-    logger.debug('Saving goal%s', goal)
+    logger.debug('Saving goal %s', goal)
     db.save_goal(goal)
     return {'from_day': goal.from_day}, HTTPStatus.OK
 
@@ -174,7 +176,7 @@ def save_meal():
     meal = Meal(label, ingredients, calories=calories, protein=protein, meals_created=meals_created, meals_remaining=meals_created)
 
     logger.debug('Adding new meal %s', meal)
-    id = db.save_meal(meal)
+    db.save_meal(meal)
     return dataclasses.asdict(meal), HTTPStatus.OK
 
 
@@ -182,5 +184,5 @@ def delete_meal():
     data = request.get_json()
     id = data['id']
     logger.debug('Deleting meal id %s', id)
-    id = db.delete_meal(id)
+    db.delete_meal(id)
     return {}, HTTPStatus.OK

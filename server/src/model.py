@@ -29,7 +29,6 @@ class Meal:
   meals_created: int
   meals_remaining: int
   time_created: str = util.date_to_string(datetime.datetime.now())
-  times_eaten: list[str] = field(default_factory=lambda: [])
   favourite: bool = False
 
 
