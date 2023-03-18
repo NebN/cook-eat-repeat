@@ -36,15 +36,13 @@ export const useMealStore = defineStore('meals', {
       this.mealHistory = mealHistory
     },
     async eatMeal(meal, date) {
-      const asd = {
-        id: meal.id,
-        date: date.toISOString()
-      }
-
       const resp = await axios({
         method: 'post',
         url: '/api/meal/eat',
-        data: asd
+        data: ({
+          id: meal.id,
+          date: date.toLocaleDateString('en-CA', {year: 'numeric', month: '2-digit', day: '2-digit'})
+        })
       })
       
       this.selectedMeal = null
