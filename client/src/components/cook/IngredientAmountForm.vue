@@ -12,7 +12,7 @@
       </div>
     </Divider>
     <div v-if="computedCalories != null">{{ computedCalories.toFixed() }} calories</div>
-    <div v-if="computedProtein != null">{{ computedProtein.toFixed() }} protein</div>
+    <div v-if="computedProtein != null">{{ computedProtein.toFixed(1) }} protein</div>
     <ConfirmOrCancel v-if="computedGrams > 0" @confirm="confirm" @cancel="cancel"/>
   </div>
 </div>
@@ -28,12 +28,20 @@ const quantityInputModes = ref(['grams', 'servings'])
 const selectedInputMode = ref(quantityInputModes.value[0])
 const addModes = ref(['In total','For each meal'])
 const selectedAddMode = ref(addModes.value[0])
+let caloriesPer1Gram = 0
+let proteinPer1Gram = 0
 
 onMounted(() => {
   quantity.value = null
 
+
+
   const inputIngredient = dialogRef.value.data.ingredient
   ingredient.value = inputIngredient
+
+  const inputIngredientGrams = parseFloat(inputIngredient.grams) || 100
+  caloriesPer1Gram = parseFloat(inputIngredient.calories) / inputIngredientGrams
+  proteinPer1Gram = parseFloat(inputIngredient.protein) / inputIngredientGrams
 
   if (inputIngredient.per_meal) {
     selectedAddMode.value = addModes.value[1]
@@ -70,11 +78,11 @@ const computedGrams = computed(() => {
 })
 
 const computedCalories = computed(() => {
-  return computedGrams.value * ingredient.value.calories / 100
+  return computedGrams.value * caloriesPer1Gram
 })
 
 const computedProtein = computed(() =>  {
-  return computedGrams.value * ingredient.value.protein / 100
+  return computedGrams.value * proteinPer1Gram
 })
 
 const servings = () => {
